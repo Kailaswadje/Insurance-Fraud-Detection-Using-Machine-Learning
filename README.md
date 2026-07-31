@@ -1,78 +1,82 @@
-# Insurance Fraud Detection — Machine Learning Classification
+# 🕵️ Insurance Fraud Detection Using Machine Learning
 
-A machine learning pipeline that detects fraudulent vehicle insurance claims for Global Insure, built on **1,000 historical claims across 40 features**. The project combines class-imbalance handling, RFECV feature selection, and two classifiers — Logistic Regression and a tuned Random Forest — to automate early fraud risk scoring.
+A binary classification system that flags potentially fraudulent insurance claims, helping insurers prioritise investigations and reduce payout losses — built on an imbalanced, real-world-style claims dataset.
 
-## Business Objective
+![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python&logoColor=white)
+![scikit--learn](https://img.shields.io/badge/scikit--learn-Classification-F7931E?logo=scikitlearn&logoColor=white)
+![Imbalanced](https://img.shields.io/badge/Challenge-Class%20Imbalance-red)
+![Domain](https://img.shields.io/badge/Domain-InsurTech-blueviolet)
 
-Global Insure loses significant money to fraudulent claims that are only caught late, after payouts are made. This project analyses historical claim, policy, and incident data to classify incoming claims as fraudulent or legitimate, so high-risk claims can be fast-tracked to investigators while genuine customers get faster approvals.
+---
 
-## Dataset
+## 📌 Business Problem
 
-| Property | Detail |
-|---|---|
-| Records | 1,000 claims × 40 columns |
-| Target | `fraud_reported` — 24.7% fraudulent (247 Y / 753 N) — imbalanced |
-| Missing data | `property_damage` (360 '?'), `police_report_available` (343 '?'), `collision_type` (178 '?'); fully-null `_c39` column dropped |
-| Feature types | Policy details, insured demographics, incident attributes, claim amounts |
+Fraudulent claims cost insurers billions annually, but investigating every claim is impossible. The goal: build a model that **ranks claims by fraud probability**, so investigation teams focus effort where it matters. In this domain, **recall on the fraud class is the metric that counts** — a missed fraud costs far more than a false alarm.
 
-## Key EDA Findings
+---
 
-- Fraudulent claims average **$60,302** vs **$50,289** for legitimate ones (~20% higher)
-- **Major Damage incidents carry a 60.5% fraud rate**, versus just 10.7% for Minor Damage and 6.7% for Trivial Damage — incident severity is the single strongest signal
-- Engineered features such as `days_between_policy_and_incident` and age groups exposed suspicious timing patterns
+## 📊 Dataset
 
-## Methodology
+Claim-level records combining:
 
-1. **Cleaning** — replaced '?' placeholders, dropped null/low-variance and leakage-prone columns
-2. **Train–Validation Split** then **RandomOverSampler** applied to training data to correct the 75/25 class imbalance
-3. **Feature Engineering** — dummy encoding, rare-category grouping, scaling, derived time-based features
-4. **Feature Selection** — RFECV with 5-fold StratifiedKFold; `incident_severity` dummies ranked top
-5. **Model 1: Logistic Regression** — with optimal-cutoff analysis via sensitivity–specificity and precision–recall curves
-6. **Model 2: Random Forest** — GridSearchCV over 576 hyperparameter combinations (2,880 fits); best: `n_estimators=100, max_depth=20, class_weight='balanced_subsample'`; 5-fold CV accuracy ≈ 90.6%
+- **Policy details** — policy tenure, premium, coverage type, deductible
+- **Insured profile** — age, occupation, hobbies, relationship
+- **Incident details** — type, severity, time, location, witnesses, police report
+- **Claim amounts** — injury, property, and vehicle claim components
+- **Target** — `fraud_reported` (Y/N)
 
-## Model Performance
+---
 
-| Metric | Logistic Regression (validation) | Random Forest (test, tuned) |
-|---|---|---|
-| Accuracy | 81.0% | 79.0% |
-| Sensitivity (Recall) | 67.6% | 55.4% |
-| Specificity | 85.4% | 86.7% |
-| Precision | 60.2% | 57.8% |
-| F1 Score | 0.637 | 0.566 |
+## 🔬 Approach
 
-Hyperparameter tuning lifted Random Forest recall from **0.27 to 0.55** and F1 from **0.30 to 0.56**. Threshold tuning offers further recall gains where the business cost of missed fraud outweighs false alarms.
+1. **EDA** — fraud rate across incident types, severities, and claim amounts
+2. **Data cleaning** — handling '?' placeholder values, dropping leakage-prone columns
+3. **Feature engineering** — encoding categoricals, deriving claim ratios
+4. **Class imbalance handling** — evaluated resampling and class-weighting strategies
+5. **Model comparison** — Logistic Regression vs tree-based models (Decision Tree / Random Forest)
+6. **Evaluation** — confusion matrix, precision, **recall**, F1, ROC-AUC — not just accuracy
 
-## Top Predictors of Fraud
+---
 
-`incident_severity` · `total_claim_amount` · `policy_annual_premium` · `days_between_policy_and_incident` · `incident_hour_of_the_day`
+## 📈 Results
 
-## Business Impact
+| Model | Accuracy | Recall (Fraud) | F1 | ROC-AUC |
+|---|---|---|---|---|
+| Logistic Regression | XX% | XX% | X.XX | X.XX |
+| Random Forest | XX% | XX% | X.XX | X.XX |
 
-- **Fraud loss reduction** — flag high-value suspicious claims before payout
-- **Operational efficiency** — auto-triage claims so investigators focus on high-risk cases
-- **Faster approvals** — low-risk claims clear quicker, improving customer satisfaction
-- **Regulatory compliance** — interpretable feature importances support audit and due-diligence requirements
+> On imbalanced data, a model predicting "no fraud" for everything scores high accuracy while catching zero fraud. That's why this project evaluates on **recall and ROC-AUC** instead.
 
-## Tech Stack
+---
 
-`Python` · `pandas` · `NumPy` · `scikit-learn` (LogisticRegression, RandomForestClassifier, RFECV, GridSearchCV, StratifiedKFold) · `imbalanced-learn` (RandomOverSampler) · `seaborn` / `matplotlib`
+## 💡 Key Insights
 
-## Repository Structure
+- Incident severity and claim amount patterns are strong fraud signals
+- Claims lacking police reports or witnesses show elevated fraud rates
+- Certain hobby/occupation combinations correlate with fraud in the data — a reminder to audit features for fairness before production use
 
-```
-├── Fraudulent_Claim_Detection.ipynb   # Full analysis notebook
-├── insurance_claims.csv               # Dataset (1,000 claims)
-├── Fraudulent_Detection_Report.pdf    # Summary report with findings
-└── README.md
-```
+---
 
-## How to Run
+## 🛠️ Tech Stack
+
+Python · Pandas · NumPy · scikit-learn · Matplotlib · Seaborn · Jupyter Notebook
+
+---
+
+## 🚀 How to Run
 
 ```bash
-pip install pandas numpy scikit-learn imbalanced-learn seaborn matplotlib
-jupyter notebook Fraudulent_Claim_Detection.ipynb
+git clone https://github.com/Kailaswadje/Insurance-Fraud-Detection-Using-Machine-Learning.git
+cd Insurance-Fraud-Detection-Using-Machine-Learning
+pip install pandas numpy scikit-learn matplotlib seaborn jupyter
+jupyter notebook
 ```
 
 ---
 
-*Author: Kailas Wadje — MSc Data Science & AI, University of Liverpool*
+## 👤 Author
+
+**Kailas Wadje** — MSc Data Science & AI, University of Liverpool
+[GitHub](https://github.com/Kailaswadje) · [LinkedIn](https://www.linkedin.com/in/kwadaje/)
+
+⭐ Star the repo if you found it useful!
